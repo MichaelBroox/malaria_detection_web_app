@@ -1,22 +1,16 @@
+
+sudo: required
+services:
+  - docker
 language: python
-jobs:
-  include:
-    - name: "Python 3.8.8 on Xenial Linux"
-    python:
-      - 3.8
-    - name: "Python 3.8.8 on Windows"
-    os: windows
-    language: shell
-    before_install:
-      - choco install python --version 3.8.8
-      - python -m pip install --upgrade pip
-    env: PATH=/c/Pyhton38:/c/Python38/Scripts:$PATH
 install:
-  - pip3 install --upgrade pip
-  - pip3 install -r requirements.txt || pip install -r requirements.txt
+  - pip install -r requirements.txt
 # command to run tests
 script:
   # unit test
-  - python3 -m pytest -v || python -m pytest -v 
+  - python -m pytest -v
   # linting test
-  - flake
+  # - flake8
+after_success:
+  - sh .travis/deploy_dockerhub.sh
+  - test "$TRAVIS_BRANCH" = "master" && sh .travis/deploy_heroku.sh
